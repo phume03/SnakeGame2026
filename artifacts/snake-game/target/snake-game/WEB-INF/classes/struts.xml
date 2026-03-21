@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+    "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+    <constant name="struts.convention.action.packages" value="com.snakegame.action"/>
+    <constant name="struts.convention.result.path" value="/WEB-INF/jsp/"/>
+    <constant name="struts.devMode" value="false"/>
+    <constant name="struts.action.extension" value="action,,"/>
+    <constant name="struts.ui.theme" value="simple"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+
+    <package name="default" namespace="/" extends="struts-default">
+        <action name="index" class="com.snakegame.action.HomeAction">
+            <result name="success">/WEB-INF/jsp/home.jsp</result>
+        </action>
+    </package>
+
+    <package name="game" namespace="/game" extends="struts-default">
+        <action name="single" class="com.snakegame.action.GameAction" method="single">
+            <result name="success">/WEB-INF/jsp/game.jsp</result>
+        </action>
+        <action name="multi" class="com.snakegame.action.GameAction" method="multi">
+            <result name="success">/WEB-INF/jsp/game.jsp</result>
+        </action>
+    </package>
+
+    <package name="leaderboard" namespace="/leaderboard" extends="struts-default">
+        <action name="top" class="com.snakegame.action.LeaderboardAction" method="top">
+            <result name="success">/WEB-INF/jsp/leaderboard.jsp</result>
+        </action>
+        <action name="player" class="com.snakegame.action.LeaderboardAction" method="player">
+            <result name="success">/WEB-INF/jsp/leaderboard.jsp</result>
+        </action>
+    </package>
+</struts>

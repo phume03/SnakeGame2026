@@ -48,6 +48,20 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## Java Snake Game (artifacts/snake-game)
+
+A complete Java 8 + Struts 2 + WebSocket multiplayer snake game built as a deployable WAR.
+
+- **Language**: Java 8 (compiled with `-source 1.8 -target 1.8`)
+- **Framework**: Apache Struts 2.5.33 (convention plugin, JSON plugin)
+- **Real-time**: JSR-356 WebSocket (`@ServerEndpoint`)
+- **Database**: H2 in-memory (leaderboard, resets on restart)
+- **Serialization**: Jackson ObjectMapper
+- **Build**: Maven → produces `target/snake-game.war`
+- **Run dev**: `mvn tomcat7:run` (embedded Tomcat 7; deploy WAR to Tomcat 8 for production)
+- **Context path**: `/snake`
+- **Features**: Single player vs AI (BFS), Multiplayer (3 players/world, auto-matchmaking), 10 deterministic levels, warp mechanic (double-tap), up to 5 colored apples, leaderboard
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)
