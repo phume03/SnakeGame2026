@@ -66,15 +66,25 @@ A complete Java 8 + Struts 2 + WebSocket multiplayer snake game built as a deplo
 
 ### `artifacts/api-server` (`@workspace/api-server`)
 
-Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` for request and response validation and `@workspace/db` for persistence.
+Express 5 API server with a full multiplayer Snake game engine.
 
-- Entry: `src/index.ts` — reads `PORT`, starts Express
+- Entry: `src/index.ts` — creates HTTP server, attaches WebSocket, reads `PORT`
 - App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
-- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
+- WebSocket: `src/websocket.ts` — ws server at `/api/ws/game`, handles JOIN_SINGLE, JOIN_MULTI, START, INPUT
+- Routes: `src/routes/leaderboard.ts` → `GET /api/leaderboard`, `GET /api/leaderboard/player/:name`, `GET /api/leaderboard/matches`
+- Routes: `src/routes/worlds.ts` → `GET /api/worlds`
+- Game engine: `src/game/`
+  - `constants.ts` — all game constants (source of truth for sync script)
+  - `levels.ts` — 10 level obstacle definitions (source of truth for sync script)
+  - `types.ts` — shared TypeScript types
+  - `snake.ts` — Snake class with double-tap warp logic
+  - `ai.ts` — BFS AI controller
+  - `world.ts` — GameWorld (game loop, collision, scoring, level progression)
+  - `worldManager.ts` — singleton matchmaking manager
+  - `leaderboard.ts` — in-memory leaderboard store
 - Depends on: `@workspace/db`, `@workspace/api-zod`
 - `pnpm --filter @workspace/api-server run dev` — run the dev server
-- `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
-- Build bundles an allowlist of deps (express, cors, pg, drizzle-orm, zod, etc.) and externalizes the rest
+- `pnpm --filter @workspace/api-server run build` — production esbuild bundle
 
 ### `lib/db` (`@workspace/db`)
 
@@ -105,6 +115,18 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+### `artifacts/snake-arena` (`@workspace/snake-arena`)
+
+React + Vite frontend for Snake Arena. The preview proxy forwards `/api` to the api-server on port 8080.
+
+- Home page (`/`): mode selection (single-player vs multiplayer), leaderboard preview, active-worlds badge
+- Game page (`/game`): full-screen canvas game via WebSocket (`/api/ws/game`)
+- Leaderboard page (`/leaderboard`): full scores table + recent matches
+- WebSocket hook: `src/hooks/use-game-websocket.ts` — handles all message types
+- Canvas rendering: `src/components/game/SnakeCanvas.tsx`
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+- `scripts/src/sync-to-java.mjs` — reads `constants.ts` + `levels.ts` from api-server game engine, regenerates `GameConstants.java` + `LevelDesigner.java` in the Java project, patches constants in `GameWorld.java`, then runs `mvn package -DskipTests` to rebuild the WAR. Run with: `node scripts/src/sync-to-java.mjs`

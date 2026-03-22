@@ -1,0 +1,15 @@
+packages:
+  "framer-motion": "Smooth overlay animations and retro transitions"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility function to efficiently merge Tailwind CSS classes"
+  "lucide-react": "Beautiful consistent icons"
+
+images:
+  - path: "artifacts/snake-arena/public/images/retro-bg.png"
+    description: "Dark retro vaporwave outrun grid background, deep purple and black sky, faint neon cyan horizon grid, minimalist, high contrast, seamless"
+    aspect_ratio: "16:9"
+
+notes:
+  - The game uses WebSocket at /api/ws/game for real-time state.
+  - Orval React Query hooks are imported from @workspace/api-client-react.
+  - Using framer-motion for level transition popups and game over screens.

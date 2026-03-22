@@ -3,20 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Snake Arena API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: leaderboard
+    description: Leaderboard and score tracking
+  - name: worlds
+    description: Game world information
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +27,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get top scores
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /leaderboard/player/{playerName}:
+    get:
+      operationId: getPlayerScores
+      tags: [leaderboard]
+      summary: Get scores for a specific player
+      parameters:
+        - in: path
+          name: playerName
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Player scores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /leaderboard/matches:
+    get:
+      operationId: getRecentMatches
+      tags: [leaderboard]
+      summary: Get recent match records
+      responses:
+        "200":
+          description: Recent matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchRecord"
+
+  /worlds:
+    get:
+      operationId: getActiveWorlds
+      tags: [worlds]
+      summary: Get active game worlds info
+      responses:
+        "200":
+          description: Active worlds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorldsInfo"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +105,50 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    LeaderboardEntry:
+      type: object
+      properties:
+        playerName:
+          type: string
+        score:
+          type: integer
+        level:
+          type: integer
+        gameMode:
+          type: string
+        playedAt:
+          type: string
+      required: [playerName, score, level, gameMode, playedAt]
+
+    MatchRecord:
+      type: object
+      properties:
+        worldId:
+          type: string
+        playerNames:
+          type: array
+          items:
+            type: string
+        winnerName:
+          type: string
+          nullable: true
+        gameMode:
+          type: string
+        playedAt:
+          type: string
+      required: [worldId, playerNames, gameMode, playedAt]
+
+    WorldsInfo:
+      type: object
+      properties:
+        totalWorlds:
+          type: integer
+        waitingWorlds:
+          type: integer
+        runningWorlds:
+          type: integer
+        totalPlayers:
+          type: integer
+      required: [totalWorlds, waitingWorlds, runningWorlds, totalPlayers]
